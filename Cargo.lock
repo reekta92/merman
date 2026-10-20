@@ -1643,7 +1643,7 @@ version = "0.6.0"
 dependencies = [
  "criterion",
  "image",
- "merman-core",
+ "merman-core-clin",
  "merman-render",
  "resvg 0.46.0",
  "roxmltree 0.20.0",
@@ -1666,7 +1666,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "merman-core"
+name = "merman-core-clin"
 version = "0.6.0"
 dependencies = [
  "chrono",
@@ -1701,7 +1701,7 @@ dependencies = [
  "futures",
  "indexmap",
  "manatee",
- "merman-core",
+ "merman-core-clin",
  "pulldown-cmark",
  "regex",
  "roughr-merman",
@@ -3607,7 +3607,7 @@ dependencies = [
  "dugong",
  "futures",
  "merman",
- "merman-core",
+ "merman-core-clin",
  "merman-render",
  "regex",
  "roxmltree 0.20.0",

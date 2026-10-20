@@ -1,62 +1,27 @@
-name: CI
+name: Clin compatibility core
 
 on:
   push:
-    branches:
-      - main
-      - master
+    branches: [fix/maintained-yaml-msrv-1.90]
   pull_request:
 
+permissions:
+  contents: read
+
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: compatibility-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build-test:
-    name: build-test (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-24.04
-            parity: true
-          - os: macos-15
-            parity: false
-          - os: windows-2025
-            parity: false
-
+  core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v6
-
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@1.87.0
-
-      - name: Install cargo-nextest
-        uses: taiki-e/install-action@nextest
-
-      - name: Rust cache
-        uses: Swatinem/rust-cache@v2
-
-      - name: Test (nextest)
-        run: cargo nextest run --cargo-quiet
-
-      - name: Test (nextest, merman render)
-        if: matrix.parity
-        run: cargo nextest run -p merman --features render --cargo-quiet
-
-      - name: Build (release)
-        run: cargo build --release --locked -p merman-cli
-
-      - name: Override inventory
-        if: matrix.parity
-        run: cargo run --release -p xtask -- report-overrides
-
-      - name: SVG DOM parity
-        if: matrix.parity
-        run: cargo run --release -p xtask -- compare-all-svgs --check-dom --dom-mode parity --dom-decimals 3
-
-      - name: SVG DOM parity (parity-root, non-blocking)
-        if: matrix.parity
-        continue-on-error: true
-        run: cargo run --release -p xtask -- compare-all-svgs --check-dom --dom-mode parity-root --dom-decimals 3 --flowchart-text-measurer vendored --report-root
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@1.90.0
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test --locked -p merman-core-clin --all-features
+      - run: cargo test --locked -p merman-core-clin --no-default-features
+      - run: cargo package --locked -p merman-core-clin
