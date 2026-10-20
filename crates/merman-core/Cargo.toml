@@ -1,18 +1,21 @@
 [package]
-name = "merman-core"
+name = "merman-core-clin"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
 license.workspace = true
 homepage.workspace = true
-repository.workspace = true
-rust-version.workspace = true
-description = "Mermaid parser + semantic model (headless; parity-focused)."
-documentation = "https://docs.rs/merman-core"
+repository = "https://github.com/reekta92/merman"
+rust-version = "1.90"
+description = "Clin compatibility fork of merman-core 0.6 with a maintained YAML backend"
+documentation = "https://docs.rs/merman-core-clin"
 readme = "README.md"
 keywords = ["mermaid", "diagrams", "parser", "ast"]
 categories = ["parser-implementations", "visualization"]
 build = "build.rs"
+
+[lib]
+name = "merman_core"
 
 [features]
 default = ["large-features"]

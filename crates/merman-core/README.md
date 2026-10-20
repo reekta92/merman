@@ -1,4 +1,20 @@
-# merman-core
+# merman-core-clin
+
+Clin's compatibility fork of upstream `merman-core 0.6.0`, based on
+`91722fd1881ae37fd276788fe78a5cc7274d4cde`. It preserves that parser API and
+semantic snapshot corpus while replacing archived `serde_yaml` with maintained
+`yaml_serde 0.10.7`. Rust 1.90 is supported. Upstream MIT/Apache-2.0 licensing
+and attribution are retained.
+
+```toml
+merman-core = { package = "merman-core-clin", version = "=0.6.0", default-features = false }
+```
+
+This registry dependency carries the maintained backend to consumers without a
+root Cargo patch. The library import remains `merman_core`. Maintenance is scoped
+to this compatibility package on `fix/maintained-yaml-msrv-1.90`; the fork's `main`
+tracks upstream. Retire this package when the host can adopt a maintained upstream
+release within its supported compiler and API requirements.
 
 `merman-core` is the parser and semantic-model crate behind [merman](https://crates.io/crates/merman). Use it when you need Mermaid detection, metadata, semantic JSON, or typed render models without pulling in layout, SVG, or raster dependencies.
 

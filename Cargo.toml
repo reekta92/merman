@@ -62,7 +62,7 @@ unicode-width = "0.2.2"
 # Workspace crates (publishable). Keeping versions explicit makes `cargo publish` work without
 # duplicating version requirements across crates.
 merman = { path = "crates/merman", version = "0.6.0" }
-merman-core = { path = "crates/merman-core", version = "0.6.0" }
+merman-core = { package = "merman-core-clin", path = "crates/merman-core", version = "0.6.0" }
 merman-render = { path = "crates/merman-render", version = "0.6.0" }
 merman-cli = { path = "crates/merman-cli", version = "0.6.0" }
 dugong = { path = "crates/dugong", version = "0.6.0" }
