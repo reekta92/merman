@@ -37,6 +37,21 @@ foo["bar"] {
 }
 
 #[test]
+fn parse_diagram_er_attribute_keys_preserve_utf8_boundaries() {
+    for name in ["名前", "éa", "aé", "🦀"] {
+        let source = format!("erDiagram\n資料 {{\ntext {name} PK,FK \"日本語\"\n}}");
+        let parsed = Engine::new()
+            .parse_diagram_sync(&source, ParseOptions::strict())
+            .unwrap()
+            .unwrap();
+        let attribute = &parsed.model["entities"]["資料"]["attributes"][0];
+        assert_eq!(attribute["name"], name);
+        assert_eq!(attribute["keys"], json!(["PK", "FK"]));
+        assert_eq!(attribute["comment"], "日本語");
+    }
+}
+
+#[test]
 fn parse_diagram_er_empty_quoted_entity_name_is_error() {
     let engine = Engine::new();
     let err = block_on(engine.parse_diagram("erDiagram\n\"\"\n", ParseOptions::default()))
