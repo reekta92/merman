@@ -1716,6 +1716,25 @@ fn parse_diagram_flowchart_subgraph_bracket_quoted_title_sets_label_type_string(
 }
 
 #[test]
+fn parse_diagram_flowchart_subgraph_quoted_title_preserves_delimiters() {
+    for quote in ['"', '\''] {
+        let source = format!(
+            "flowchart TB\nsubgraph storage[{quote}Database; [private] records{quote}];A-->B;end;B-->C"
+        );
+        let parsed = Engine::new()
+            .parse_diagram_sync(&source, ParseOptions::strict())
+            .unwrap()
+            .unwrap();
+        assert_eq!(parsed.model["subgraphs"][0]["id"], "storage");
+        assert_eq!(
+            parsed.model["subgraphs"][0]["title"],
+            "Database; [private] records"
+        );
+        assert_eq!(parsed.model["edges"].as_array().unwrap().len(), 2);
+    }
+}
+
+#[test]
 fn parse_diagram_flowchart_subgraph_markdown_title_sets_label_type_markdown() {
     let engine = Engine::new();
     let text = "graph TD\nsubgraph \"`**Two**`\"\nA-->B\nend";

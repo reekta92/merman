@@ -494,14 +494,11 @@ impl<'input> Lexer<'input> {
             id_equals_title = false;
             self.pos += 1;
             let title_start = self.pos;
-            while self.pos < self.input.len() && self.input.as_bytes()[self.pos] != b']' {
-                if self.input.as_bytes()[self.pos] == b'\n'
-                    || self.input.as_bytes()[self.pos] == b';'
-                {
-                    break;
-                }
-                self.pos += 1;
-            }
+            self.pos =
+                lex::find_unquoted_delim(self.input, title_start, "]").unwrap_or_else(|| {
+                    let tail = &self.input[title_start..];
+                    title_start + tail.find(['\n', '\r', ';']).unwrap_or(tail.len())
+                });
             raw_title = self.input[title_start..self.pos].to_string();
             let trimmed = raw_title.trim();
             if (trimmed.starts_with('"') && trimmed.ends_with('"'))
