@@ -51,6 +51,7 @@ impl DiagramRegistry {
         reg.insert("state", crate::diagrams::state::parse_state);
 
         reg.insert("mindmap", crate::diagrams::mindmap::parse_mindmap);
+        #[cfg(feature = "gantt")]
         reg.insert("gantt", crate::diagrams::gantt::parse_gantt);
         reg.insert("timeline", crate::diagrams::timeline::parse_timeline);
         reg.insert("journey", crate::diagrams::journey::parse_journey);
@@ -92,6 +93,7 @@ pub enum RenderSemanticModel {
     Class(crate::models::class_diagram::ClassDiagram),
     C4(crate::diagrams::c4::C4DiagramRenderModel),
     Kanban(crate::diagrams::kanban::KanbanDiagramRenderModel),
+    #[cfg(feature = "gantt")]
     Gantt(crate::diagrams::gantt::GanttDiagramRenderModel),
     Pie(crate::diagrams::pie::PieDiagramRenderModel),
     Packet(crate::diagrams::packet::PacketDiagramRenderModel),
@@ -121,6 +123,7 @@ impl RenderSemanticModel {
             Self::Class(_) => "class",
             Self::C4(_) => "c4",
             Self::Kanban(_) => "kanban",
+            #[cfg(feature = "gantt")]
             Self::Gantt(_) => "gantt",
             Self::Pie(_) => "pie",
             Self::Packet(_) => "packet",
@@ -152,6 +155,7 @@ impl RenderSemanticModel {
             Self::Class(_) => matches!(diagram_type, "classDiagram" | "class"),
             Self::C4(_) => diagram_type == "c4",
             Self::Kanban(_) => diagram_type == "kanban",
+            #[cfg(feature = "gantt")]
             Self::Gantt(_) => diagram_type == "gantt",
             Self::Pie(_) => diagram_type == "pie",
             Self::Packet(_) => diagram_type == "packet",
@@ -241,6 +245,7 @@ impl RenderDiagramRegistry {
             crate::diagrams::kanban::parse_kanban_model_for_render(code, meta)
                 .map(RenderSemanticModel::Kanban)
         });
+        #[cfg(feature = "gantt")]
         reg.insert("gantt", |code, meta| {
             crate::diagrams::gantt::parse_gantt_model_for_render(code, meta)
                 .map(RenderSemanticModel::Gantt)

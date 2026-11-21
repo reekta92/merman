@@ -5,6 +5,7 @@ pub mod class;
 pub mod er;
 pub mod error_diagram;
 pub mod flowchart;
+#[cfg(feature = "gantt")]
 pub mod gantt;
 pub mod git_graph;
 pub mod info;
