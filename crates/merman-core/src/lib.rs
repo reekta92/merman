@@ -18,9 +18,11 @@ pub mod generated;
 pub mod geom;
 pub mod models;
 pub mod preprocess;
+#[cfg(feature = "gantt")]
 mod runtime;
 pub mod sanitize;
 mod theme;
+#[cfg(feature = "gantt")]
 pub mod time;
 pub mod utils;
 
@@ -71,7 +73,9 @@ pub struct Engine {
     diagram_registry: DiagramRegistry,
     render_diagram_registry: RenderDiagramRegistry,
     site_config: MermaidConfig,
+    #[cfg(feature = "gantt")]
     fixed_today_local: Option<chrono::NaiveDate>,
+    #[cfg(feature = "gantt")]
     fixed_local_offset_minutes: Option<i32>,
 }
 
@@ -84,7 +88,9 @@ impl Default for Engine {
             diagram_registry: DiagramRegistry::default_mermaid_11_12_2(),
             render_diagram_registry: RenderDiagramRegistry::default_mermaid_11_12_2(),
             site_config,
+            #[cfg(feature = "gantt")]
             fixed_today_local: None,
+            #[cfg(feature = "gantt")]
             fixed_local_offset_minutes: None,
         }
     }
@@ -109,6 +115,7 @@ impl Engine {
     ///
     /// This exists primarily to make fixture snapshots deterministic. By default, Mermaid uses the
     /// current local date.
+    #[cfg(feature = "gantt")]
     pub fn with_fixed_today(mut self, today: Option<chrono::NaiveDate>) -> Self {
         self.fixed_today_local = today;
         self
@@ -119,6 +126,7 @@ impl Engine {
     ///
     /// This exists primarily to make fixture snapshots deterministic across CI runners. When
     /// `None`, the system local timezone is used.
+    #[cfg(feature = "gantt")]
     pub fn with_fixed_local_offset_minutes(mut self, offset_minutes: Option<i32>) -> Self {
         self.fixed_local_offset_minutes = offset_minutes;
         self
@@ -249,16 +257,18 @@ impl Engine {
         let preprocess = preprocess_start.map(|s| s.elapsed());
 
         let parse_start = timing_enabled.then(std::time::Instant::now);
+        let parse_model = || {
+            diagram::parse_or_unsupported(&self.diagram_registry, &meta.diagram_type, &code, &meta)
+        };
+        #[cfg(feature = "gantt")]
         let parse = crate::runtime::with_fixed_today_local(self.fixed_today_local, || {
-            crate::runtime::with_fixed_local_offset_minutes(self.fixed_local_offset_minutes, || {
-                diagram::parse_or_unsupported(
-                    &self.diagram_registry,
-                    &meta.diagram_type,
-                    &code,
-                    &meta,
-                )
-            })
+            crate::runtime::with_fixed_local_offset_minutes(
+                self.fixed_local_offset_minutes,
+                parse_model,
+            )
         });
+        #[cfg(not(feature = "gantt"))]
+        let parse = parse_model();
 
         let mut model = match parse {
             Ok(v) => v,
@@ -489,6 +499,7 @@ impl Engine {
                 }
             }
             RenderSemanticModel::Kanban(_) => {}
+            #[cfg(feature = "gantt")]
             RenderSemanticModel::Gantt(v) => {
                 if let Some(s) = v.title.as_deref() {
                     v.title = Some(crate::sanitize::sanitize_text(s, effective_config));
@@ -656,16 +667,18 @@ impl Engine {
             return Ok(None);
         };
 
+        let parse_model = || {
+            diagram::parse_or_unsupported(&self.diagram_registry, &meta.diagram_type, &code, &meta)
+        };
+        #[cfg(feature = "gantt")]
         let parse = crate::runtime::with_fixed_today_local(self.fixed_today_local, || {
-            crate::runtime::with_fixed_local_offset_minutes(self.fixed_local_offset_minutes, || {
-                diagram::parse_or_unsupported(
-                    &self.diagram_registry,
-                    &meta.diagram_type,
-                    &code,
-                    &meta,
-                )
-            })
+            crate::runtime::with_fixed_local_offset_minutes(
+                self.fixed_local_offset_minutes,
+                parse_model,
+            )
         });
+        #[cfg(not(feature = "gantt"))]
+        let parse = parse_model();
 
         let mut model = match parse {
             Ok(v) => v,

@@ -18,8 +18,9 @@ build = "build.rs"
 name = "merman_core"
 
 [features]
-default = ["large-features"]
+default = ["large-features", "gantt"]
 large-features = []
+gantt = ["dep:chrono"]
 
 [dependencies]
 euclid.workspace = true
@@ -37,7 +38,7 @@ tracing.workspace = true
 lol_html.workspace = true
 url.workspace = true
 uuid.workspace = true
-chrono.workspace = true
+chrono = { workspace = true, optional = true }
 ryu-js.workspace = true
 rustc-hash.workspace = true
 
